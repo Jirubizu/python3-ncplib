@@ -3,6 +3,18 @@ Changelog
 
 .. currentmodule:: ncplib
 
+6.2.0 - 31/03/2023
+------------------
+
+- Added ``recv_all`` and ``send_packets`` to :meth:`connection` for sending and receiving multiple packets at once.
+
+
+6.1.1 - 13/03/2023
+------------------
+
+- Fixed ``I64A`` and ``U64A`` field types when decoding.
+
+
 6.1.0 - 11/06/2022
 ------------------
 

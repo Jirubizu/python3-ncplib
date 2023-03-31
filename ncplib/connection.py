@@ -64,7 +64,7 @@ from itertools import cycle
 import logging
 from time import time
 from types import TracebackType
-from typing import AsyncIterator, Awaitable, Callable, Dict, List, Mapping, Optional, Set, Tuple, Type, TypeVar
+from typing import AsyncIterator, Awaitable, Callable, Dict, List, Mapping, Optional, Set, Tuple, Type, TypeVar, Iterable
 from uuid import getnode as get_mac
 import warnings
 from ncplib.errors import NetworkError, NetworkTimeoutError, ConnectionClosed, DecodeError, DecodeWarning
@@ -445,6 +445,28 @@ class Connection(AsyncIteratorMixin):
             field = await self.recv()
             if field.packet_type == packet_type and field.name == field_name:
                 return field
+            
+    async def recv_all(self, max_fields) -> Iterable[Field]:
+        """
+        Waits for all the next matching :class:`Field` received by the connection.
+
+        :param int max_fields: The maximum number of fields to receive.
+        :raises ncplib.NCPError: if a field could not be retrieved from the connection.
+        :return: The Iterable of :class:`Field` received.
+        :rtype: Iterable[Field]
+        """
+        
+        i = 0
+        fields = []
+        while i < max_fields:
+            field = await self.recv()
+            if (
+                field.packet_type == self._packet_type and
+                (field.name, field.id) in self._expected_fields
+            ):
+                fields.append(field)
+                i += 1
+        return fields
 
     # Packet writing.
 
@@ -491,6 +513,20 @@ class Connection(AsyncIteratorMixin):
             for field_name, field_params
             in fields.items()
         ])
+    
+    def send_packets(self, packet_type:str, fields: Iterable[Tuple[str, Param]]) -> Response:
+        """
+        Sends multiple :term:`NCP packets <NCP packet>`.
+
+        :param str packet_type: The packet type, must be a valid :term:`identifier`.
+        :param Iterable[Tuple[str, Param]] fields: An iterable of tuples, each containing a field name and a :class:`dict
+        
+        :return: A :class:`Response` providing access to any :class:`Field` instances received in reply to
+            the sent packets.
+        :rtype: Response
+        """
+
+        return self._send_packet(packet_type, [(field[0], _gen_id(), field[1].items()) for field in fields])
 
     def send(self, packet_type: str, field_name: str, **params: Param) -> Response:
         """

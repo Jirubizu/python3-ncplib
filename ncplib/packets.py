@@ -91,8 +91,8 @@ ARRAY_TYPE_CODES_TO_TYPE_ID = {
     "b": TYPE_ARRAY_I8,
     "h": TYPE_ARRAY_I16,
     "i": TYPE_ARRAY_I32,
-    "L": TYPE_ARRAY_U64,
-    "l": TYPE_ARRAY_I64,
+    "Q": TYPE_ARRAY_U64,
+    "q": TYPE_ARRAY_I64,
     "f": TYPE_ARRAY_F32,
     "d": TYPE_ARRAY_F64,
 }
@@ -261,9 +261,9 @@ def decode_packet_cps(header_buf: Bytes) -> Tuple[int, Callable[[Bytes], Packet]
                 elif param_type_id == TYPE_ARRAY_I32:
                     param_value = array("i", param_value_raw)
                 elif param_type_id == TYPE_ARRAY_U64:
-                    param_value = array("L", param_value_raw)
+                    param_value = array("Q", param_value_raw)
                 elif param_type_id == TYPE_ARRAY_I64:
-                    param_value = array("l", param_value_raw)
+                    param_value = array("q", param_value_raw)
                 elif param_type_id == TYPE_ARRAY_F32:
                     param_value = array("f", param_value_raw)
                 elif param_type_id == TYPE_ARRAY_F64:

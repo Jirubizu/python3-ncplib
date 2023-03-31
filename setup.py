@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ncplib",
-    version="6.1.0",
+    version="6.2.0",
     license="BSD",
     description="CRFS NCP library for Python 3.",
     author="Dave Hall",
