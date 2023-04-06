@@ -450,22 +450,20 @@ class Connection(AsyncIteratorMixin):
         """
         Waits for all the next matching :class:`Field` received by the connection.
 
-        :param int max_fields: The maximum number of fields to receive.
+        :param int max_fields: The number of fields to receive.
         :raises ncplib.NCPError: if a field could not be retrieved from the connection.
         :return: The Iterable of :class:`Field` received.
         :rtype: Iterable[Field]
         """
-        
-        i = 0
+
         fields = []
-        while i < max_fields:
+        for _ in range(max_fields):
             field = await self.recv()
             if (
                 field.packet_type == self._packet_type and
                 (field.name, field.id) in self._expected_fields
             ):
                 fields.append(field)
-                i += 1
         return fields
 
     # Packet writing.
@@ -516,13 +514,13 @@ class Connection(AsyncIteratorMixin):
     
     def send_packets(self, packet_type:str, fields: Iterable[Tuple[str, Param]]) -> Response:
         """
-        Sends multiple :term:`NCP packets <NCP packet>`.
+        Sends a :term:`NCP packet <NCP packet>` with multiple fields.
 
         :param str packet_type: The packet type, must be a valid :term:`identifier`.
         :param Iterable[Tuple[str, Param]] fields: An iterable of tuples, each containing a field name and a :class:`dict
         
         :return: A :class:`Response` providing access to any :class:`Field` instances received in reply to
-            the sent packets.
+            the sent packet.
         :rtype: Response
         """
 
